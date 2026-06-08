@@ -1,9 +1,12 @@
 [package]
+rust-version = "1.70"
+readme = "README.md"
 name = "constraint-schedule"
 version = "0.1.0"
 edition = "2021"
 license = "MIT"
 repository = "https://github.com/SuperInstance/constraint-schedule"
+documentation = "https://docs.rs/constraint-schedule"
 description = "Constraint-satisfaction scheduling for agent task allocation — CSP solver with AC-3 and simulated annealing"
 
 [dependencies]
