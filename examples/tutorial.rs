@@ -28,8 +28,7 @@ fn main() {
     let agents = vec![
         AgentProfile::new("alice", vec!["rust".into(), "wasm".into()], 2)
             .with_preferences(alice_prefs),
-        AgentProfile::new("bob", vec!["python".into(), "ml".into()], 3)
-            .with_preferences(bob_prefs),
+        AgentProfile::new("bob", vec!["python".into(), "ml".into()], 3).with_preferences(bob_prefs),
         AgentProfile::new("carol", vec!["rust".into(), "python".into()], 2)
             .with_preferences(carol_prefs),
     ];
@@ -150,8 +149,10 @@ fn main() {
         let opt_result = optimizer.optimize(schedule, &agents, &tasks);
         println!(
             "  Cost: {:.3} → {:.3} ({} iterations, {} accepted)",
-            opt_result.initial_cost, opt_result.final_cost,
-            opt_result.iterations, opt_result.accepted
+            opt_result.initial_cost,
+            opt_result.final_cost,
+            opt_result.iterations,
+            opt_result.accepted
         );
         println!("  Time: {:.2?}", opt_result.elapsed);
         println!();
@@ -160,14 +161,18 @@ fn main() {
         for (task_id, assignment) in &opt_result.schedule.assignments {
             println!(
                 "  {} → {} [t={}, end={}]",
-                task_id, assignment.agent_id,
-                assignment.start_time, assignment.end_time()
+                task_id,
+                assignment.agent_id,
+                assignment.start_time,
+                assignment.end_time()
             );
         }
         println!();
 
         // Verify the optimized schedule is still valid
-        assert!(opt_result.schedule.is_valid(&agents, &tasks, &Constraints::new()));
+        assert!(opt_result
+            .schedule
+            .is_valid(&agents, &tasks, &Constraints::new()));
         println!("  ✓ Optimized schedule is valid");
     }
     println!();
@@ -181,9 +186,7 @@ fn main() {
         "  Relaxed mode found schedule: {}",
         relaxed_result.schedule.is_some()
     );
-    println!(
-        "  (Relaxed mode ignores capability, capacity, deadline, and dependency constraints)"
-    );
+    println!("  (Relaxed mode ignores capability, capacity, deadline, and dependency constraints)");
 
     println!("\n=== Tutorial complete! ===");
 }

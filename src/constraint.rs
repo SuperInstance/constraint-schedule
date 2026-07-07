@@ -88,8 +88,7 @@ impl ConstraintChecker {
     ) -> Vec<ConstraintViolation> {
         let mut violations = Vec::new();
 
-        if self.constraints.capability_match
-            && !agent.has_capabilities(&task.required_capabilities)
+        if self.constraints.capability_match && !agent.has_capabilities(&task.required_capabilities)
         {
             violations.push(ConstraintViolation {
                 constraint_name: "capability_match".into(),
@@ -173,14 +172,10 @@ impl ConstraintChecker {
     ) -> Vec<ConstraintViolation> {
         let mut violations = Vec::new();
 
-        let agent_map: std::collections::HashMap<&str, &AgentProfile> = agents
-            .iter()
-            .map(|a| (a.id.as_str(), a))
-            .collect();
-        let task_map: std::collections::HashMap<&str, &TaskSpec> = tasks
-            .iter()
-            .map(|t| (t.id.as_str(), t))
-            .collect();
+        let agent_map: std::collections::HashMap<&str, &AgentProfile> =
+            agents.iter().map(|a| (a.id.as_str(), a)).collect();
+        let task_map: std::collections::HashMap<&str, &TaskSpec> =
+            tasks.iter().map(|t| (t.id.as_str(), t)).collect();
 
         for (task_id, assignment) in &schedule.assignments {
             let task = match task_map.get(task_id.as_str()) {
@@ -200,7 +195,8 @@ impl ConstraintChecker {
                 }
             };
 
-            if self.constraints.capability_match && !agent.has_capabilities(&task.required_capabilities)
+            if self.constraints.capability_match
+                && !agent.has_capabilities(&task.required_capabilities)
             {
                 violations.push(ConstraintViolation {
                     constraint_name: "capability_match".into(),
@@ -251,8 +247,7 @@ impl ConstraintChecker {
                 if let Some(our_assignment) = schedule.assignments.get(&task.id) {
                     for dep_id in &task.dependencies {
                         if let Some(dep_assignment) = schedule.assignments.get(dep_id) {
-                            let dep_end =
-                                dep_assignment.start_time + dep_assignment.duration;
+                            let dep_end = dep_assignment.start_time + dep_assignment.duration;
                             if our_assignment.start_time < dep_end {
                                 violations.push(ConstraintViolation {
                                     constraint_name: "dependency_ordering".into(),
@@ -280,14 +275,10 @@ impl ConstraintChecker {
         agents: &[AgentProfile],
         tasks: &[TaskSpec],
     ) -> f64 {
-        let agent_map: std::collections::HashMap<&str, &AgentProfile> = agents
-            .iter()
-            .map(|a| (a.id.as_str(), a))
-            .collect();
-        let task_map: std::collections::HashMap<&str, &TaskSpec> = tasks
-            .iter()
-            .map(|t| (t.id.as_str(), t))
-            .collect();
+        let agent_map: std::collections::HashMap<&str, &AgentProfile> =
+            agents.iter().map(|a| (a.id.as_str(), a)).collect();
+        let task_map: std::collections::HashMap<&str, &TaskSpec> =
+            tasks.iter().map(|t| (t.id.as_str(), t)).collect();
 
         let mut cost = 0.0;
 
@@ -308,12 +299,8 @@ impl ConstraintChecker {
         for assignment in schedule.assignments.values() {
             *counts.entry(assignment.agent_id.as_str()).or_insert(0) += 1;
         }
-        let avg = counts.values().copied().sum::<u32>() as f64
-            / counts.len().max(1) as f64;
-        let variance: f64 = counts
-            .values()
-            .map(|c| (*c as f64 - avg).powi(2))
-            .sum();
+        let avg = counts.values().copied().sum::<u32>() as f64 / counts.len().max(1) as f64;
+        let variance: f64 = counts.values().map(|c| (*c as f64 - avg).powi(2)).sum();
         cost += self.constraints.load_balance_weight * variance;
 
         // Deadline slack cost: prefer schedules that finish earlier
@@ -323,8 +310,7 @@ impl ConstraintChecker {
                 if end <= task.deadline {
                     let slack = task.deadline - end;
                     // Lower slack is worse; cost increases with less slack
-                    cost += self.constraints.deadline_slack_weight
-                        * (1.0 / (slack as f64 + 1.0));
+                    cost += self.constraints.deadline_slack_weight * (1.0 / (slack as f64 + 1.0));
                 }
             }
         }
@@ -413,7 +399,9 @@ mod tests {
             },
         );
         let violations = checker.check_assignment(&tasks[0], &agents[0], &schedule, &tasks);
-        assert!(violations.iter().any(|v| v.constraint_name == "capacity_limits"));
+        assert!(violations
+            .iter()
+            .any(|v| v.constraint_name == "capacity_limits"));
     }
 
     #[test]

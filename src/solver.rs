@@ -50,11 +50,7 @@ impl CSPSolver {
     }
 
     /// Solve the scheduling problem. Returns the first valid schedule found.
-    pub fn solve(
-        &self,
-        agents: &[AgentProfile],
-        tasks: &[TaskSpec],
-    ) -> SolverResult {
+    pub fn solve(&self, agents: &[AgentProfile], tasks: &[TaskSpec]) -> SolverResult {
         let start = Instant::now();
         let checker = ConstraintChecker::new(self.constraints.clone());
 
@@ -118,11 +114,7 @@ impl CSPSolver {
     }
 
     /// Solve and find the optimal schedule (lowest cost) within time budget.
-    pub fn solve_optimal(
-        &self,
-        agents: &[AgentProfile],
-        tasks: &[TaskSpec],
-    ) -> SolverResult {
+    pub fn solve_optimal(&self, agents: &[AgentProfile], tasks: &[TaskSpec]) -> SolverResult {
         let start = Instant::now();
         let checker = ConstraintChecker::new(self.constraints.clone());
 
@@ -218,12 +210,7 @@ impl CSPSolver {
 
         for (agent_id, start_time) in &valid_values {
             *nodes += 1;
-            schedule.assign(
-                &task.id,
-                agent_id,
-                *start_time,
-                task.duration_estimate,
-            );
+            schedule.assign(&task.id, agent_id, *start_time, task.duration_estimate);
 
             // Forward check: prune future domains
             if self.forward_check(tasks, idx + 1, schedule, agents, all_tasks) {
@@ -292,12 +279,7 @@ impl CSPSolver {
 
         for (agent_id, start_time) in &valid_values {
             *nodes += 1;
-            schedule.assign(
-                &task.id,
-                agent_id,
-                *start_time,
-                task.duration_estimate,
-            );
+            schedule.assign(&task.id, agent_id, *start_time, task.duration_estimate);
 
             if self.forward_check(tasks, idx + 1, schedule, agents, all_tasks) {
                 self.backtrack_optimal(
@@ -407,9 +389,10 @@ impl CSPSolver {
 
             // Check dependencies first
             if self.constraints.dependency_ordering {
-                let all_deps_met = task.dependencies.iter().all(|dep_id| {
-                    schedule.assignments.contains_key(dep_id)
-                });
+                let all_deps_met = task
+                    .dependencies
+                    .iter()
+                    .all(|dep_id| schedule.assignments.contains_key(dep_id));
                 if !all_deps_met && !task.dependencies.is_empty() {
                     // Not all deps scheduled yet, but some might be
                     // At least check that unscheduled deps aren't impossible
@@ -473,7 +456,7 @@ impl CSPSolver {
 
         while let Some((xi, xj)) = queue.pop_front() {
             if self.revise(domains, &xi, &xj, tasks, agents) {
-                if domains.get(&xi).is_none_or(|d| d.is_empty()) {
+                if domains.get(&xi).map_or(true, |d| d.is_empty()) {
                     return; // Domain wiped out
                 }
                 // Re-add arcs from neighbors
@@ -514,14 +497,8 @@ impl CSPSolver {
 
         // If xj is a dependency of xi, prune xi start times that can't be after xj ends
         if xi_task.dependencies.contains(&xj.to_string()) {
-            if let (Some(_xi_domain), Some(_xj_domain)) =
-                (domains.get(xi), domains.get(xj))
-            {
-                let _max_xj_end = _xj_domain
-                    .iter()
-                    .map(|(_, st)| *st)
-                    .max()
-                    .unwrap_or(0);
+            if let (Some(_xi_domain), Some(_xj_domain)) = (domains.get(xi), domains.get(xj)) {
+                let _max_xj_end = _xj_domain.iter().map(|(_, st)| *st).max().unwrap_or(0);
                 // xi must start after xj ends, but we need xj's duration to compute end
                 // This is a simplified check; full checking happens in backtracking
                 let _ = _max_xj_end;
@@ -532,11 +509,7 @@ impl CSPSolver {
     }
 
     /// Order tasks by MRV (minimum remaining values): fewest domain options first.
-    fn order_tasks_mrv(
-        &self,
-        tasks: &[TaskSpec],
-        agents: &[AgentProfile],
-    ) -> Vec<TaskSpec> {
+    fn order_tasks_mrv(&self, tasks: &[TaskSpec], agents: &[AgentProfile]) -> Vec<TaskSpec> {
         let mut tasks: Vec<TaskSpec> = tasks.to_vec();
         tasks.sort_by(|a, b| {
             let count_a = agents
@@ -782,8 +755,12 @@ mod tests {
             AgentProfile::new("a2", vec!["rust".into(), "python".into()], 2),
         ];
         let tasks = vec![
-            TaskSpec::new("t1", vec!["rust".into()]).with_deadline(100).with_duration(10),
-            TaskSpec::new("t2", vec!["python".into()]).with_deadline(100).with_duration(10),
+            TaskSpec::new("t1", vec!["rust".into()])
+                .with_deadline(100)
+                .with_duration(10),
+            TaskSpec::new("t2", vec!["python".into()])
+                .with_deadline(100)
+                .with_duration(10),
         ];
         let solver = CSPSolver::new();
         let ordered = solver.order_tasks_mrv(&tasks, &agents);

@@ -39,14 +39,26 @@ fn main() {
     generic_prefs.insert("deploy".to_string(), 10.0);
 
     let agents = vec![
-        AgentProfile::new("linux-1", vec!["rust".into(), "docker".into(), "test".into()], 2)
-            .with_preferences(linux_prefs),
+        AgentProfile::new(
+            "linux-1",
+            vec!["rust".into(), "docker".into(), "test".into()],
+            2,
+        )
+        .with_preferences(linux_prefs),
         AgentProfile::new("gpu-1", vec!["ml".into(), "benchmark".into()], 1)
             .with_preferences(gpu_prefs),
-        AgentProfile::new("mac-1", vec!["swift".into(), "ios".into(), "test".into()], 2)
-            .with_preferences(mac_prefs),
-        AgentProfile::new("generic-1", vec!["docs".into(), "lint".into(), "deploy".into()], 3)
-            .with_preferences(generic_prefs),
+        AgentProfile::new(
+            "mac-1",
+            vec!["swift".into(), "ios".into(), "test".into()],
+            2,
+        )
+        .with_preferences(mac_prefs),
+        AgentProfile::new(
+            "generic-1",
+            vec!["docs".into(), "lint".into(), "deploy".into()],
+            3,
+        )
+        .with_preferences(generic_prefs),
     ];
 
     // Pipeline stages with dependency chain:
@@ -104,19 +116,23 @@ fn main() {
             .with_deadline(130)
             .with_duration(10)
             .with_priority(10)
-            .with_dependencies(vec![
-                "benchmark".into(),
-                "test-ios".into(),
-                "docs".into(),
-            ]),
+            .with_dependencies(vec!["benchmark".into(), "test-ios".into(), "docs".into()]),
     ];
 
-    println!("Pipeline: {} tasks across {} agents\n", tasks.len(), agents.len());
+    println!(
+        "Pipeline: {} tasks across {} agents\n",
+        tasks.len(),
+        agents.len()
+    );
     for t in &tasks {
         println!(
             "  {} — needs {:?}, deadline={}, dur={}, deps={:?}, pri={}",
-            t.id, t.required_capabilities, t.deadline,
-            t.duration_estimate, t.dependencies, t.priority
+            t.id,
+            t.required_capabilities,
+            t.deadline,
+            t.duration_estimate,
+            t.dependencies,
+            t.priority
         );
     }
     println!();
@@ -142,7 +158,12 @@ fn main() {
                 let bar_start = assignment.start_time as usize / 5;
                 let bar_len = assignment.duration as usize / 5;
                 let bar: String = "·".repeat(bar_start) + &"█".repeat(bar_len.max(1));
-                println!("{:<15} → {:<10} {}", format!("{}", task_id), assignment.agent_id, bar);
+                println!(
+                    "{:<15} → {:<10} {}",
+                    format!("{}", task_id),
+                    assignment.agent_id,
+                    bar
+                );
             }
             println!();
 
@@ -191,10 +212,17 @@ fn main() {
                 let bar_start = assignment.start_time as usize / 5;
                 let bar_len = assignment.duration as usize / 5;
                 let bar: String = "·".repeat(bar_start) + &"█".repeat(bar_len.max(1));
-                println!("{:<15} → {:<10} {}", format!("{}", task_id), assignment.agent_id, bar);
+                println!(
+                    "{:<15} → {:<10} {}",
+                    format!("{}", task_id),
+                    assignment.agent_id,
+                    bar
+                );
             }
 
-            assert!(opt_result.schedule.is_valid(&agents, &tasks, &Constraints::new()));
+            assert!(opt_result
+                .schedule
+                .is_valid(&agents, &tasks, &Constraints::new()));
             println!("\n✓ Optimized schedule is valid");
         }
         None => {

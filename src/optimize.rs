@@ -159,14 +159,10 @@ impl ScheduleOptimizer {
         }
 
         let task_ids: Vec<String> = neighbor.assignments.keys().cloned().collect();
-        let task_map: std::collections::HashMap<&str, &TaskSpec> = tasks
-            .iter()
-            .map(|t| (t.id.as_str(), t))
-            .collect();
-        let agent_map: std::collections::HashMap<&str, &AgentProfile> = agents
-            .iter()
-            .map(|a| (a.id.as_str(), a))
-            .collect();
+        let task_map: std::collections::HashMap<&str, &TaskSpec> =
+            tasks.iter().map(|t| (t.id.as_str(), t)).collect();
+        let agent_map: std::collections::HashMap<&str, &AgentProfile> =
+            agents.iter().map(|a| (a.id.as_str(), a)).collect();
 
         // Choose a random move type
         let move_type: f64 = rng.random();
@@ -236,8 +232,10 @@ impl ScheduleOptimizer {
                                     && ag2.has_capabilities(&tk1.required_capabilities)
                                 {
                                     // Swap agent assignments
-                                    let agent_id_1 = neighbor.assignments.get(t1).map(|a| a.agent_id.clone());
-                                    let agent_id_2 = neighbor.assignments.get(t2).map(|a| a.agent_id.clone());
+                                    let agent_id_1 =
+                                        neighbor.assignments.get(t1).map(|a| a.agent_id.clone());
+                                    let agent_id_2 =
+                                        neighbor.assignments.get(t2).map(|a| a.agent_id.clone());
                                     if let (Some(id1), Some(id2)) = (agent_id_1, agent_id_2) {
                                         if let Some(a1) = neighbor.assignments.get_mut(t1) {
                                             a1.agent_id = id2;
@@ -348,8 +346,7 @@ mod tests {
             time_budget: Duration::from_millis(100),
         };
         let (agents, tasks, schedule) = make_setup();
-        let optimizer =
-            ScheduleOptimizer::new(Constraints::new()).with_config(config);
+        let optimizer = ScheduleOptimizer::new(Constraints::new()).with_config(config);
         let result = optimizer.optimize(&schedule, &agents, &tasks);
         // With very short budget, should still complete
         assert!(result.elapsed < Duration::from_secs(1));
@@ -362,9 +359,15 @@ mod tests {
             AgentProfile::new("a2", vec!["rust".into()], 3),
         ];
         let tasks = vec![
-            TaskSpec::new("t1", vec!["rust".into()]).with_deadline(100).with_duration(10),
-            TaskSpec::new("t2", vec!["rust".into()]).with_deadline(100).with_duration(10),
-            TaskSpec::new("t3", vec!["rust".into()]).with_deadline(100).with_duration(10),
+            TaskSpec::new("t1", vec!["rust".into()])
+                .with_deadline(100)
+                .with_duration(10),
+            TaskSpec::new("t2", vec!["rust".into()])
+                .with_deadline(100)
+                .with_duration(10),
+            TaskSpec::new("t3", vec!["rust".into()])
+                .with_deadline(100)
+                .with_duration(10),
         ];
 
         // All on one agent

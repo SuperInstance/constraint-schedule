@@ -154,8 +154,7 @@ mod tests {
 
     #[test]
     fn test_earliest_start_multiple_deps() {
-        let t =
-            TaskSpec::new("t1", vec![]).with_dependencies(vec!["t0".into(), "t0b".into()]);
+        let t = TaskSpec::new("t1", vec![]).with_dependencies(vec!["t0".into(), "t0b".into()]);
         let mut ct = std::collections::HashMap::new();
         ct.insert("t0".to_string(), 30);
         ct.insert("t0b".to_string(), 50);
@@ -164,13 +163,17 @@ mod tests {
 
     #[test]
     fn test_latest_start() {
-        let t = TaskSpec::new("t1", vec![]).with_deadline(100).with_duration(20);
+        let t = TaskSpec::new("t1", vec![])
+            .with_deadline(100)
+            .with_duration(20);
         assert_eq!(t.latest_start(), 80);
     }
 
     #[test]
     fn test_latest_start_overflow() {
-        let t = TaskSpec::new("t1", vec![]).with_deadline(5).with_duration(100);
+        let t = TaskSpec::new("t1", vec![])
+            .with_deadline(5)
+            .with_duration(100);
         assert_eq!(t.latest_start(), 0);
     }
 

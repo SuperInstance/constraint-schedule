@@ -51,8 +51,8 @@ pub mod solver;
 pub mod task;
 
 pub use agent::AgentProfile;
-pub use constraint::{ConstraintChecker, Constraints, ConstraintViolation};
-pub use optimize::{ScheduleOptimizer, AnnealingConfig, OptimizationResult};
-pub use schedule::{Schedule, Assignment, ScheduleConflict, ConflictType};
+pub use constraint::{ConstraintChecker, ConstraintViolation, Constraints};
+pub use optimize::{AnnealingConfig, OptimizationResult, ScheduleOptimizer};
+pub use schedule::{Assignment, ConflictType, Schedule, ScheduleConflict};
 pub use solver::{CSPSolver, SolverResult};
 pub use task::{TaskSpec, TaskState};
